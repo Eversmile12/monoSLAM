@@ -87,10 +87,12 @@ def main():
         max_features=500,
         scale_factor=1.05,
         nlevels=8,
-        edge_threshold=15,
+        fast_threshold=10,
         first_level=0,
-        mask_borders=5,
-        use_clahe=True
+        grid_size=6,
+        features_per_grid=20,
+        adaptive_threshold=True,
+        use_clahe=True  # Use contrast enhancement for better feature detection
     )
     
     print("Creating motion config...")
@@ -143,8 +145,14 @@ def main():
             # Get current timestamp
             timestamp = time.time() - start_time
             
-            # Process frame
-            gray, keypoints, descriptors = processor.process_frame(frame)
+            # Process frame - convert to grayscale and detect features
+            if len(frame.shape) > 2:
+                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            else:
+                gray = frame
+            
+            # Detect features
+            keypoints, descriptors = processor.detect_features(gray)
             
             # Detect and track motion
             success, R, t, position = motion_estimator.process_frame(

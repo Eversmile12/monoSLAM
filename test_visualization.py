@@ -140,9 +140,12 @@ def main():
     try:
         while True:
             # Get frame from camera
-            frame = cam.get_frame()
-            if frame is None:
+            frame_data = cam.get_frame()
+            if frame_data is None:
                 continue
+            
+            # Unpack the frame tuple
+            frame = frame_data[0]
             
             # Get current timestamp
             timestamp = time.time() - start_time

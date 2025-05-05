@@ -67,7 +67,22 @@ class BaseVisualizer:
         if size is None:
             size = self.window_size
         
-        return np.ones((size[1], size[0], 3), dtype=np.uint8) * color
+        # Create a blank image with the specified color
+        # Ensure the color is a tuple of integers to avoid any compatibility issues
+        color_tuple = tuple([int(c) for c in color])
+        
+        # Create a properly formatted numpy array for OpenCV
+        height, width = size[1], size[0]
+        img = np.zeros((height, width, 3), dtype=np.uint8)
+        
+        # Fill with the specified color
+        if isinstance(color, (list, tuple)) and len(color) == 3:
+            img[:] = color_tuple
+        else:
+            # Default to black if color format is incorrect
+            img[:] = (0, 0, 0)
+            
+        return img
     
     def add_text(self, image, text, position, color=None, scale=None, thickness=None):
         """

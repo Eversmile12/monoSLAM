@@ -164,11 +164,15 @@ def main():
                 frame, keypoints, descriptors, timestamp, gray
             )
             
-            # Get motion statistics
+            # Get motion statistics from motion estimator
             stats = motion_estimator.get_motion_stats()
             
             # Get tracking quality info for display
-            tracking_info = motion_estimator.get_tracking_quality()
+            tracking_info = {
+                'quality': stats['tracking_quality'],
+                'in_recovery_mode': stats['consecutive_failures'] > 0,
+                'motion_model_active': stats['consecutive_failures'] > 0
+            }
             
             # Print debug info occasionally
             if frame_count % 10 == 0:

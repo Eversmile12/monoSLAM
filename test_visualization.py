@@ -102,8 +102,8 @@ def main():
     
     print("Initializing motion estimator...")
     motion_estimator = MotionEstimator(
-        cam.get_camera_matrix(),
-        cam.get_distortion_coefficients(),
+        camera_matrix=cam.camera_matrix,
+        dist_coeffs=cam.dist_coeffs,
         config=config
     )
     
@@ -298,7 +298,7 @@ def main():
                     'keyframes_enabled': config.use_keyframes,
                     'adaptive_params_enabled': config.enable_adaptive_parameters,
                     'total_frames': frame_count,
-                    'camera_matrix': cam.get_camera_matrix().tolist(),
+                    'camera_matrix': cam.camera_matrix.tolist() if cam.camera_matrix is not None else None,
                     'camera_resolution': [width, height]
                 }
             )

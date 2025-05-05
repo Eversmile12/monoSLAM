@@ -160,9 +160,21 @@ def main():
             keypoints, descriptors = processor.detect_features(gray)
             
             # Detect and track motion
-            success, R, t, position = motion_estimator.process_frame(
-                frame, keypoints, descriptors, timestamp, gray
-            )
+            try:
+                success, R, t, position = motion_estimator.process_frame(
+                    frame, keypoints, descriptors, timestamp, gray
+                )
+                
+                # Convert success to boolean if it's an array
+                if isinstance(success, np.ndarray):
+                    success = bool(success.any())
+                    
+            except Exception as e:
+                print(f"Error in motion processing: {e}")
+                success = False
+                R = np.eye(3)
+                t = np.zeros((3, 1))
+                position = np.zeros(3)
             
             # Get motion statistics from motion estimator
             stats = motion_estimator.get_motion_stats()
@@ -191,7 +203,19 @@ def main():
             # Get data for visualization
             trajectory = motion_estimator.get_trajectory()
             keyframes = motion_estimator.get_keyframes() if config.use_keyframes else []
-            keyframe_positions = np.array([kf.position for kf in keyframes]) if keyframes else np.zeros((0, 3))
+            
+            # Safely create keyframe positions array
+            if keyframes and len(keyframes) > 0:
+                try:
+                    keyframe_positions = np.array([kf.position for kf in keyframes if hasattr(kf, 'position') and kf.position is not None])
+                    # Ensure we have at least one valid position
+                    if keyframe_positions.size == 0:
+                        keyframe_positions = np.zeros((0, 3))
+                except Exception as e:
+                    print(f"Error creating keyframe positions: {e}")
+                    keyframe_positions = np.zeros((0, 3))
+            else:
+                keyframe_positions = np.zeros((0, 3))
             
             # Get matched points for visualization
             matched_kp1 = motion_estimator.matched_kp1

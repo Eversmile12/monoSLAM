@@ -91,9 +91,11 @@ def main():
         first_level=0,
         grid_size=6,
         features_per_grid=20,
-        adaptive_threshold=True,
-        use_clahe=True  # Use contrast enhancement for better feature detection
+        adaptive_threshold=True
     )
+    
+    # Enable CLAHE for better feature detection after initialization
+    processor.use_clahe = True
     
     print("Creating motion config...")
     config = create_motion_config(args)
